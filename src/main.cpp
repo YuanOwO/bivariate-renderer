@@ -6,34 +6,38 @@
 #include "env.hpp"
 #include "errors.hpp"
 
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 6
+#define VERSION_PATCH 0
+
 extern int yyparse();  // Bison 生成的函數
 extern FILE* yyin;     // Flex 使用的檔案指針
 
 std::vector<StmtPtr> statements;  // 由 parser.y 中的 program 規則填充
 
 void printHelp(const char* program_name) {
+    std::cout << "==================================================" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Bivariate Renderer - A simple mathematical expression parser and plotter" << std::endl;
     std::cout << "Usage: " << program_name << "[options] [input_file]" << std::endl;
-
+    std::cout << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -h, --help              Show this help message and exit" << std::endl;
     std::cout << "  -v, --version           Show version information and exit" << std::endl;
-
-    std::cout << "If no input_file is provided, the program will read from standard input." << std::endl;
-    std::cout << "Therefore, please remember to end your input with EOF (Ctrl+D on Unix/Linux/Mac, Ctrl+Z on "
-                 "Windows)."
-              << std::endl;
+    std::cout << std::endl;
     std::cout << "Example usage:" << std::endl;
     std::cout << "  " << program_name << " test.math" << std::endl;
+    std::cout << std::endl;
+    std::cout << "==================================================" << std::endl;
 }
 
 void printVersion() {
-    std::cout << "0.5.0" << std::endl;
+    std::cout << "Bivariate Renderer version " << VERSION_MAJOR << "." << VERSION_MINOR << "."
+              << VERSION_PATCH << std::endl;
 }
 
 int main(int argc, char** argv) {
-    if (argc == 1) {
-        yyin = stdin;  // 從標準輸入讀取
-    } else {
+    if (argc > 1) {
         // 處理命令行參數，支援選項和輸入檔案
         for (int i = 1; i < argc; i++) {
             std::string arg = argv[i];
@@ -78,27 +82,15 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    if (yyin != stdin) {
-        fclose(yyin);  // 記得關閉檔案
-    }
+    fclose(yyin);  // 記得關閉檔案
 
     Environment global_env = initGlobalEnvironment();  // 全域環境
 
     std::cout << statements.size() << " 條陳述句已解析。" << std::endl;
 
-    // for (size_t i = 0; i < statements.size(); i++) {
-    //     auto stmt = statements[i];
-
-    //     std::cout << "陳述句 " << i + 1 << " @ " << stmt->getLineno() << " 行: ";
-    //     stmt->serialize(std::cout);
-    //     std::cout << std::endl;
-    // }
-
     for (size_t i = 0; i < statements.size(); i++) {
         auto stmt = statements[i];
-
-        stmt->serialize(std::cout);  // 輸出原始陳述句
-        std::cout << std::endl << std::endl;
+        // std::cout << stmt << std::endl << std::endl;
 
         try {
             stmt->validate(global_env);  // 驗證語法和語義
@@ -109,7 +101,7 @@ int main(int argc, char** argv) {
             delete stmt;                             // 釋放原始陳述句的記憶體
 
             std::cout << "折疊後的陳述句 " << i + 1 << ": " << statements[i] << std::endl;
-            std::cout << "\n\n==================================================\n\n";
+            std::cout << "\n==================================================\n" << std::endl;
 
             // stmt->evaluate(global_env);  // 評估陳述句，這裡的返回值可以根據需要進行處理
         } catch (const SemanticError& e) {
@@ -120,14 +112,6 @@ int main(int argc, char** argv) {
             return 1;
         }
     }
-
-    // for (size_t i = 0; i < statements.size(); i++) {
-    //     auto stmt = statements[i];
-
-    //     std::cout << "陳述句 " << i + 1 << ": ";
-    //     stmt->serialize(std::cout);
-    //     std::cout << std::endl;
-    // }
 
     return 0;
 }

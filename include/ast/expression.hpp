@@ -18,7 +18,7 @@ class ExpressionNode : public ASTNode {
     ExpressionNode(size_t line) : ASTNode(line) {}
 
     virtual const char* getClassName() const override { return "ExpressionNode"; }
-    virtual ExprPtr fold(Environment& env) const = 0;    // 常量折疊
+    virtual ExprPtr fold(Environment& env) const = 0;  // 常量折疊
 
     bool hasUnknownVariable() const { return has_unknown_variable; }
 };

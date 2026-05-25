@@ -12,7 +12,7 @@ extern int yylex();
 extern int yylineno;
 void yyerror(const char *s);
 
-extern std::vector<ASTNodePtr> statements;
+extern std::vector<ASTPtr> statements;
 extern Environment global_env;
 %}
 
@@ -22,10 +22,9 @@ extern Environment global_env;
 %union {
     double fval;
     std::string* sval;
-    int func_id;
     StmtPtr stmt_val;
     ExprPtr expr_val;
-    std::vector<ASTNodePtr>* node_list;
+    std::vector<StmtPtr>* stmt_list;
     std::vector<ExprPtr>* expr_list;
     std::vector<IdPtr>* id_list;
 }
@@ -33,10 +32,11 @@ extern Environment global_env;
 /* 宣告所有在 lexer.l 裡面的 Tokens */
 %token<fval> T_NUMBER
 %token<sval> T_IDENTIFIER
-%token<func_id> T_BUILTIN_FUNC
 %token T_PLOT
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_EXPONENT
 %token T_EQUALS T_LPAREN T_RPAREN T_COMMA T_SEMICOLON
+%token T_STRING_START T_STRING_END
+%token<sval> T_STRING_CONTENT
 
 %type<stmt_val> statement
 %type<expr_val> expression
@@ -78,9 +78,10 @@ statement:
         $$ = new FuncDefNode(yylineno, func_id, $3, $6);
         delete $1; // 釋放從 lexer 傳來的字串
     }
-    | T_PLOT T_LPAREN expression T_RPAREN T_SEMICOLON {
+    | T_PLOT T_LPAREN expression T_COMMA T_STRING_START T_STRING_CONTENT T_STRING_END T_RPAREN T_SEMICOLON {
         // 處理繪圖命令
-        $$ = new PlotNode(yylineno, $3);
+        $$ = new PlotNode(yylineno, $3, *$6);
+        delete $6; // 釋放從 lexer 傳來的字串
     }
     ;
 
@@ -104,11 +105,8 @@ expression:
         // 例如: (a + b)
         $$ = $2; // 括號不會產生新的 AST 節點，只是改變運算順序
     }
-    /* | T_BUILTIN_FUNC T_LPAREN expression T_RPAREN {
-        // 例如: sin(x)
-    } */
     | T_IDENTIFIER T_LPAREN argument_list T_RPAREN {
-        // 例如: my_func(a, b) (呼叫自訂函數)
+        // 例如: my_func(a, b) (呼叫函數)
         IdPtr func_id = new IdentifierNode(yylineno, *$1);
         $$ = new FuncCallNode(yylineno, func_id, $3);
         delete $1; // 釋放從 lexer 傳來的字串
@@ -175,7 +173,7 @@ argument_list:
     | expression {
         // 處理單個參數
         $$ = new std::vector<ExprPtr>(); // 初始化向量
-        $$->push_back($1); // 將第一個參數加入向量
+        $$->push_back($1);
     }
     | /* empty */ {
         // 處理空參數列表

@@ -5,6 +5,7 @@
 #include <limits>
 
 #include "env.hpp"
+#include "errors.hpp"
 #include "utils.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -23,7 +24,7 @@ bool PlotNode::validate(Environment& env) {
 
 PlotPtr PlotNode::fold(Environment& env) const {
     ExprPtr folded_expr = expression->fold(env);
-    return new PlotNode(getLineno(), folded_expr);
+    return new PlotNode(getLineno(), folded_expr, filename);
 }
 
 Value PlotNode::evaluate(Environment& env) const {
@@ -44,11 +45,11 @@ Value PlotNode::evaluate(Environment& env) const {
     Value x = x_min, y = y_min, z;
 
     for (int i = 0; i < resolution; i++) {
-        x = x_min + i * x_step;
-        local_env.setVariable("x", x);
+        y = y_max - i * y_step;  // 從上到下繪製
+        local_env.setVariable("y", y);
         for (int j = 0; j < resolution; j++) {
-            y = y_min + j * y_step;
-            local_env.setVariable("y", y);
+            x = x_min + j * x_step;
+            local_env.setVariable("x", x);
             z = expression->evaluate(local_env);
             if (std::isfinite(z)) {  // 確保 z 是有限的數值
                 z_min = std::min(z_min, z);
@@ -100,11 +101,28 @@ Value PlotNode::evaluate(Environment& env) const {
     }
 
     // 4. 呼叫 stb 函數寫出 PNG 圖片
-    const char* filename = "plot_output.png";
+    const char* filename_str = filename.c_str();
     int stride_in_bytes = resolution * channels;  // 每一行圖片佔用的位元組數
 
-    int success =
-        stbi_write_png(filename, resolution, resolution, channels, image_data.data(), stride_in_bytes);
+    int success;
+
+    switch (getImageType()) {
+    case IMAGE_PNG:
+        success = stbi_write_png(filename_str, resolution, resolution, channels, image_data.data(),
+                                 stride_in_bytes);
+        break;
+    case IMAGE_JPG:
+        // stbi_write_jpg 需要額外的品質參數，這裡暫時固定為 90
+        success = stbi_write_jpg(filename_str, resolution, resolution, channels, image_data.data(), 90);
+        break;
+    case IMAGE_BMP:
+        success = stbi_write_bmp(filename_str, resolution, resolution, channels, image_data.data());
+        break;
+    case IMAGE_TGA:
+    case IMAGE_HDR:
+    default:
+        throw RuntimeError("Unknown image format");
+    }
 
     if (success) {
         std::cout << "Successfully saved plot window as: " << filename << std::endl;
@@ -113,4 +131,29 @@ Value PlotNode::evaluate(Environment& env) const {
     }
 
     return MAGICALLY_STINKY_NUMBER;
+}
+
+IMAGE_TYPE PlotNode::getImageType() const {
+    // 根據檔案副檔名判斷圖片類型
+    if (filename.size() < 4) {
+        return IMAGE_UNKNOWN;  // 無法判斷，副檔名太短
+    }
+
+    std::string ext = filename.substr(filename.size() - 4);
+
+    if (ext == ".png" || ext == ".PNG") {
+        return IMAGE_PNG;
+    } else if (ext == ".bmp" || ext == ".BMP") {
+        return IMAGE_BMP;
+    } else if (ext == ".tga" || ext == ".TGA") {
+        return IMAGE_TGA;
+    } else if (ext == ".hdr" || ext == ".HDR") {
+        return IMAGE_HDR;
+    } else if (ext == ".jpg" || ext == ".JPG") {
+        return IMAGE_JPG;
+    } else if (ext == "jpeg" || ext == "JPEG") {
+        return filename.size() >= 5 && filename[filename.size() - 5] == '.' ? IMAGE_JPG : IMAGE_UNKNOWN;
+    }
+
+    return IMAGE_UNKNOWN;  // 預設為未知類型
 }

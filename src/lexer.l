@@ -7,7 +7,7 @@
 #include "parser.tab.hpp"
 %}
 
-%x COMMENT SINGLE_LINE_COMMENT
+%x COMMENT SINGLE_LINE_COMMENT STRING
 %option noyywrap nodefault yylineno
 
 /* 基本的正則表達式定義 */
@@ -61,6 +61,11 @@ ID          {ALPHA}({ALPHA}|{DIGIT})*
 <INITIAL>"//"               { BEGIN(SINGLE_LINE_COMMENT); }
 <SINGLE_LINE_COMMENT>\n     { BEGIN(INITIAL); }
 <SINGLE_LINE_COMMENT>.      { /* 忽略單行註釋內容 */ }
+
+    /* 字串 */
+<INITIAL>"\""                { BEGIN(STRING); return T_STRING_START; }
+<STRING>"\""                 { BEGIN(INITIAL); return T_STRING_END; }
+<STRING>[^"]+               { yylval.sval = new std::string(yytext); return T_STRING_CONTENT; }
 
     /* 其他 */
 
