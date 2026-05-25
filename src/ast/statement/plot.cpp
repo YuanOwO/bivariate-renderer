@@ -2,21 +2,13 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 #include "env.hpp"
+#include "utils.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
-
-// 輔助函數：將 0.0 ~ 1.0 的比值轉為藍->綠->紅的顏色漸層 (RGB)
-void getRGBGradient(double ratio, unsigned char& r, unsigned char& g, unsigned char& b) {
-    ratio = std::max(0.0, std::min(1.0, ratio));
-
-    // 經典的熱力圖（藍 -> 綠 -> 紅）漸層演算法
-    r = static_cast<unsigned char>(ratio * 255);
-    g = static_cast<unsigned char>((1.0 - std::abs(ratio - 0.5) * 2) * 128);  // 中間點帶點綠色
-    b = static_cast<unsigned char>((1.0 - ratio) * 255);
-}
 
 //////////////////////////////////////////////////
 
@@ -36,63 +28,79 @@ PlotPtr PlotNode::fold(Environment& env) const {
 
 Value PlotNode::evaluate(Environment& env) const {
     Environment local_env(&env);
-
-    std::vector<std::vector<Value>> plot_data;  // 用於存儲繪圖數據的二維向量
+    int resolution = 600;  // 繪圖解析度
+    int channels = 3;      // RGB 三通道
 
     double x_min = -10, x_max = 10, y_min = -10, y_max = 10;  // 繪圖範圍
-    int resolution = 600;
-    double x_step = (x_max - x_min) / resolution;  // x 軸步長
-    double y_step = (y_max - y_min) / resolution;  // y 軸步長
+    double x_step = (x_max - x_min) / resolution;             // x 軸步長
+    double y_step = (y_max - y_min) / resolution;             // y 軸步長
 
-    double z_min = 0, z_max = 1;  // 用於自動縮放 z 軸的最小值和最大值
+    double z_min = std::numeric_limits<double>::max();
+    double z_max = std::numeric_limits<double>::lowest();
+
+    std::vector<Value> plot_data;  // 用於存儲繪圖數據的二維向量
+    plot_data.resize(resolution * resolution);
+
+    Value x = x_min, y = y_min, z;
 
     for (int i = 0; i < resolution; i++) {
-        double x = x_min + i * x_step;
+        x = x_min + i * x_step;
         local_env.setVariable("x", x);
-        plot_data.emplace_back();  // 為每個 x 值創建一行數據
         for (int j = 0; j < resolution; j++) {
-            double y = y_min + j * y_step;
+            y = y_min + j * y_step;
             local_env.setVariable("y", y);
-            Value z = expression->evaluate(local_env);
+            z = expression->evaluate(local_env);
             if (std::isfinite(z)) {  // 確保 z 是有限的數值
                 z_min = std::min(z_min, z);
                 z_max = std::max(z_max, z);
             }
-            plot_data.back().push_back(z);  // 將 z 值添加到當前 x 行的數據中
+            plot_data[i * resolution + j] = z;  // 將 z 值添加到當前 x 行的數據中
         }
     }
 
-    // TODO: 處理 INF 和 NaN 的情況
+    std::vector<uint8_t> image_data(resolution * resolution * channels);  // RGB 圖像數據
 
-    for (auto& row : plot_data) {
-        for (auto& z : row) {
+    // TODO: 正規化 z 值到 [0, 1] 範圍，與處理 INF 和 NaN 的情況
+    for (size_t i = 0; i < resolution; ++i) {
+        for (size_t j = 0; j < resolution; ++j) {
+            z = plot_data[i * resolution + j];
             if (std::isfinite(z)) {
-                z = (z - z_min) / (z_max - z_min);  // 將 z 值縮放到 0.0 ~ 1.0 的範圍
-            } else {
-                z = 0.0;  // 對於無限大或 NaN，將其設置為 0.0（或其他適當的值）
+                z = normalize(z, z_min, z_max);
+            } else if (std::isinf(z)) {
+                z = (z > 0) ? 1.0 : 0.0;
+            } else {  // NaN 或其他非數值情況
+                // TODO: 我不知道怎麼處理比較好，暫時先取周圍的平均值（如果有的話）
+                Value mean_z = 0.0;
+                int count = 0;
+                if (i > 0 && std::isfinite(plot_data[(i - 1) * resolution + j])) {
+                    mean_z += plot_data[(i - 1) * resolution + j];
+                    count++;
+                }
+                if (i < resolution - 1 && std::isfinite(plot_data[(i + 1) * resolution + j])) {
+                    mean_z += plot_data[(i + 1) * resolution + j];
+                    count++;
+                }
+                if (j > 0 && std::isfinite(plot_data[i * resolution + (j - 1)])) {
+                    mean_z += plot_data[i * resolution + (j - 1)];
+                    count++;
+                }
+                if (j < resolution - 1 && std::isfinite(plot_data[i * resolution + (j + 1)])) {
+                    mean_z += plot_data[i * resolution + (j + 1)];
+                    count++;
+                }
+                z = (count > 0) ? mean_z / count : 0.0;
             }
-        }
-    }
-
-    // std::cout << "Plot data generated for expression: " << expression << std::endl;
-    std::cout << "Z range: [" << z_min << ", " << z_max << "]" << std::endl;
-    // 這裡可以將 plot_data 傳遞給繪圖函數或模組進行繪製，或者將其保存到文件中以供後續使用。
-
-    std::vector<unsigned char> image_data(resolution * resolution * 3);  // RGB 圖像數據
-    for (size_t i = 0; i < plot_data.size(); ++i) {
-        for (size_t j = 0; j < plot_data[i].size(); ++j) {
-            unsigned char r, g, b;
-            getRGBGradient(plot_data[i][j], r, g, b);
-            size_t idx = (i * resolution + j) * 3;
-            image_data[idx] = r;
-            image_data[idx + 1] = g;
-            image_data[idx + 2] = b;
+            // 根據 z 值獲取對應的 RGB 顏色，這裡使用 Viridis 漸層作為示例
+            auto rgb = getRGBGradientViridis(z);
+            size_t idx = (i * resolution + j) * channels;
+            image_data[idx] = rgb.r * 255;
+            image_data[idx + 1] = rgb.g * 255;
+            image_data[idx + 2] = rgb.b * 255;
         }
     }
 
     // 4. 呼叫 stb 函數寫出 PNG 圖片
     const char* filename = "plot_output.png";
-    int channels = 3;                             // RGB 三通道
     int stride_in_bytes = resolution * channels;  // 每一行圖片佔用的位元組數
 
     int success =
