@@ -35,16 +35,4 @@ class FuncCallNode : public ExpressionNode {
     const std::vector<ExprPtr>& getArguments() const { return arguments; }
 };
 
-// class BuiltinFuncCallNode : public FuncCallNode {
-//    public:
-//     BuiltinFuncCallNode(unsigned int line, IdPtr func_name, const std::vector<ExprPtr>* args)
-//         : FuncCallNode(line, func_name, args) {}
-// };
-
-// class UserFuncCallNode : public FuncCallNode {
-//    public:
-//     UserFuncCallNode(unsigned int line, IdPtr func_name, const std::vector<ExprPtr>* args)
-//         : FuncCallNode(line, func_name, args) {}
-// };
-
 #endif  // AST_EXPRESSION_FUNCALL_HPP

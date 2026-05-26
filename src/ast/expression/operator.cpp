@@ -34,7 +34,7 @@ void UnaryOpNode::serialize(std::ostream& os) const {
 bool UnaryOpNode::validate(Environment& env) {
     operand->validate(env);
 
-    size_t op = getOperatorId();
+    OPERATOR op = getOperatorId();
 
     if (op != OP_PLUS && op != OP_MINUS) {
         throw SemanticError("Invalid unary operator.");
@@ -50,7 +50,7 @@ bool UnaryOpNode::validate(Environment& env) {
 ExprPtr UnaryOpNode::fold(Environment& env) const {
     // 嘗試對子節點進行常量折疊
     ExprPtr folded_operand = operand->fold(env);
-    size_t op = getOperatorId();
+    OPERATOR op = getOperatorId();
 
     if (op == OP_PLUS) {
         // +x => x
@@ -79,7 +79,7 @@ ExprPtr UnaryOpNode::fold(Environment& env) const {
 
 Value UnaryOpNode::evaluate(Environment& env) const {
     double operand_value = operand->evaluate(env);
-    size_t op = getOperatorId();
+    OPERATOR op = getOperatorId();
 
     if (op == OP_PLUS) {
         return operand_value;
@@ -124,8 +124,7 @@ ExprPtr BinaryOpNode::fold(Environment& env) const {
     // 嘗試對左右子節點進行常量折疊
     ExprPtr folded_lhs = lhs->fold(env);
     ExprPtr folded_rhs = rhs->fold(env);
-
-    size_t op = getOperatorId();
+    OPERATOR op = getOperatorId();
 
     // 嘗試對二元運算進行常量折疊
     auto left_number = dynamic_cast<NumberNode*>(folded_lhs);
@@ -168,14 +167,13 @@ ExprPtr BinaryOpNode::fold(Environment& env) const {
     } else if (left_number) {
         // 如果只有左子節點折疊成數字節點，則根據運算符和左子節點的值嘗試進行簡化
         double left_value = left_number->getValue();
-        // 0 + x => x
-        // 0 - x => -x
-        // 0 * x => 0
-        // 0 / x => 0 (x != 0) -> 這裡暫時不進行折疊，因為如果 x 也折疊成 0 的話會導致除以零的錯誤
-        // 0 ^ x => 0 (x > 0), 1 (x == 0), inf (x < 0) -> 這裡暫時不進行折疊，因為如果 x 也折疊成 0 的話
-        //                                                 會導致不確定的結果
-        // 1 * x => x
         if (left_value == 0) {
+            // 0 + x => x
+            // 0 - x => -x
+            // 0 * x => 0
+            // 0 / x => 0 (x != 0) -> 這裡暫時不進行折疊，因為如果 x 也折疊成 0 的話會導致除以零的錯誤
+            // 0 ^ x => 0 (x > 0), 1 (x == 0), inf (x < 0) -> 這裡暫時不進行折疊，因為如果 x 也折疊成 0 的話
+            //                                                會導致不確定的結果
             switch (op) {
             case OP_PLUS:
                 return folded_rhs;
@@ -192,20 +190,18 @@ ExprPtr BinaryOpNode::fold(Environment& env) const {
                 break;
             }
         } else if (left_value == 1 && op == OP_MULTIPLY) {
-            return folded_rhs;  // 1 * x => x
+            // 1 * x => x
+            return folded_rhs;
         }
     } else if (right_number) {
         // 如果只有右子節點折疊成數字節點，則根據運算符和右子節點的值嘗試進行簡化
         double right_value = right_number->getValue();
-        // x + 0 => x
-        // x - 0 => x
-        // x * 0 => 0
-        // x / 0 => Division by zero error
-        // x ^ 0 => 1
-        // x * 1 => x
-        // x / 1 => x
-        // x ^ 1 => x
         if (right_value == 0) {
+            // x + 0 => x
+            // x - 0 => x
+            // x * 0 => 0
+            // x / 0 => Division by zero error
+            // x ^ 0 => 1
             switch (op) {
             case OP_PLUS:
             case OP_MINUS:
@@ -218,6 +214,9 @@ ExprPtr BinaryOpNode::fold(Environment& env) const {
                 return new NumberNode(getLineno(), 1);
             }
         } else if (right_value == 1 && (op == OP_MULTIPLY || op == OP_DIVIDE || op == OP_EXPONENT)) {
+            // x * 1 => x
+            // x / 1 => x
+            // x ^ 1 => x
             return folded_lhs;
         }
     }
@@ -229,7 +228,7 @@ ExprPtr BinaryOpNode::fold(Environment& env) const {
 Value BinaryOpNode::evaluate(Environment& env) const {
     double left_value = lhs->evaluate(env);
     double right_value = rhs->evaluate(env);
-    size_t op = getOperatorId();
+    OPERATOR op = getOperatorId();
 
     switch (op) {
     case OP_PLUS:

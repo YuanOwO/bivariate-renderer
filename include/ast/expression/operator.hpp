@@ -2,17 +2,18 @@
 #define AST_EXPRESSION_OPERATOR_HPP
 
 #include "ast/expression.hpp"
+#include "enums.hpp"
 
 class OperatorNode : public ExpressionNode {
    private:
-    const size_t op;  // 運算子符號 ID
+    const OPERATOR op;  // 運算子符號 ID
 
    public:
-    OperatorNode(size_t line, size_t operator_id) : ExpressionNode(line), op(operator_id) {}
+    OperatorNode(size_t line, OPERATOR operator_id) : ExpressionNode(line), op(operator_id) {}
 
     virtual const char* getClassName() const override { return "OperatorNode"; }
 
-    size_t getOperatorId() const { return op; }
+    OPERATOR getOperatorId() const { return op; }
     const char* getOperatorSymbol() const;
 };
 
@@ -21,7 +22,7 @@ class UnaryOpNode : public OperatorNode {
     const ExprPtr operand;
 
    public:
-    UnaryOpNode(size_t line, size_t operator_id, ExprPtr operand_node)
+    UnaryOpNode(size_t line, OPERATOR operator_id, ExprPtr operand_node)
         : OperatorNode(line, operator_id), operand(operand_node) {}
 
     const char* getClassName() const override { return "UnaryOpNode"; }
@@ -39,7 +40,7 @@ class BinaryOpNode : public OperatorNode {
     const ExprPtr rhs;
 
    public:
-    BinaryOpNode(size_t line, size_t operator_id, ExprPtr left_node, ExprPtr right_node)
+    BinaryOpNode(size_t line, OPERATOR operator_id, ExprPtr left_node, ExprPtr right_node)
         : OperatorNode(line, operator_id), lhs(left_node), rhs(right_node) {}
 
     const char* getClassName() const override { return "BinaryOpNode"; }
