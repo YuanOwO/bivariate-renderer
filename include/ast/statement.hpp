@@ -1,7 +1,7 @@
 #pragma once
 
+#include "ast/ast.hpp"
 #include "ast/expression/leaf.hpp"
-#include "basic.hpp"
 
 class Environment;
 class StatementNode;

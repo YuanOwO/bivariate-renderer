@@ -1,4 +1,4 @@
-#include "ast/basic.hpp"
+#include "ast/ast.hpp"
 
 std::ostream& operator<<(std::ostream& os, const ASTPtr& node) {
     if (node) {

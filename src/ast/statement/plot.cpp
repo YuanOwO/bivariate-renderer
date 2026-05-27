@@ -1,3 +1,6 @@
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#pragma clang diagnostic ignored "-Wdeprecated-declarations" // 忽略 stbi_write 函數的過時警告
+
 #include "ast/statement/plot.hpp"
 
 #include <cmath>
@@ -6,10 +9,8 @@
 
 #include "env.hpp"
 #include "errors.hpp"
-#include "utils.hpp"
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
+#include "utils.hpp"
 
 //////////////////////////////////////////////////
 

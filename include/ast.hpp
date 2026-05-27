@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast/basic.hpp"
+#include "ast/ast.hpp"
 #include "ast/expression.hpp"
 #include "ast/expression/funccall.hpp"
 #include "ast/expression/leaf.hpp"
