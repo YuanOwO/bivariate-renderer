@@ -25,5 +25,4 @@ class PlotNode : public StatementNode {
 
     const ExprPtr getExpression() const { return expression; }
     const String& getFilename() const { return filename; }
-    IMAGE_TYPE getImageType() const;
 };

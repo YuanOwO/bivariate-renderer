@@ -2,7 +2,8 @@
 
 #include <algorithm>
 
-using uint8_t = unsigned char;
+#include "enums.hpp"
+#include "types.hpp"
 
 struct RGBColor {
     double r, g, b;
@@ -18,6 +19,8 @@ inline double normalize(T value, T min_value, T max_value) {
     if (max_value - min_value == 0) return 0.0;  // 防止除以零
     return 1.0 * (value - min_value) / (max_value - min_value);
 }
+
+IMAGE_TYPE getImageType(String filename);
 
 RGBColor getRGBGradientJet(double ratio);
 RGBColor getRGBGradientViridis(double ratio);

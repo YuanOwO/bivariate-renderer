@@ -1,9 +1,12 @@
 #include "visitor/evaluator.hpp"
 
-#include <iostream>
+#include <cmath>
+#include <limits>
 
 #include "ast.hpp"
 #include "errors.hpp"
+#include "plot.hpp"
+#include "utils.hpp"
 
 void* Evaluator::visit(const NumberNode* node) {
     return_value = node->getValue();
@@ -121,7 +124,48 @@ void* Evaluator::visit(const PlotNode* node) {
     // 目前暫不實現具體的繪圖功能
     // 這裡可以添加對繪圖庫的調用，將計算結果渲染成圖片
 
-    std::cout << "Plotting expression to file: " << node->getFilename() << std::endl;
+    int resolution = 800;
+    Value min_x = -10, max_x = 10;
+    Value min_y = -10, max_y = 10;
+    Value step_x = (max_x - min_x) / resolution;
+    Value step_y = (max_y - min_y) / resolution;
+
+    Environment plot_env(env);  // 為繪圖創建一個新的環境，外部環境為當前環境
+    Evaluator plot_evaluator(&plot_env);
+
+    std::vector<Value> data(resolution * resolution);
+    Value z_min = std::numeric_limits<Value>::max();
+    Value z_max = std::numeric_limits<Value>::lowest();
+
+    for (size_t j = 0; j < resolution; j++) {
+        Value y = max_y - j * step_y;
+        for (size_t i = 0; i < resolution; i++) {
+            Value x = min_x + i * step_x;
+
+            plot_env.setVariable("x", x);
+            plot_env.setVariable("y", y);
+            node->getExpression()->accept(plot_evaluator);
+            Value z = plot_evaluator.return_value;
+            if (std::isfinite(z)) {
+                z_min = std::min(z_min, z);
+                z_max = std::max(z_max, z);
+            }
+            data[j * resolution + i] = z;
+        }
+    }
+
+    // normalize data to [0, 1] range for better color mapping
+    for (auto& z : data) {
+        if (std::isfinite(z)) {
+            z = normalize(z, z_min, z_max);
+        } else if (std::isinf(z)) {
+            z = z > 0 ? 1.0 : 0.0;  // 正無限大映射到 1，負無限大映射到 0
+        } else {
+            z = 0.5;  // 對於 NaN，使用中間值
+        }
+    }
+
+    renderPlot(node->getFilename(), data, resolution);
 
     return nullptr;
 }
