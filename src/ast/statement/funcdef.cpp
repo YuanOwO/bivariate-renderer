@@ -2,7 +2,7 @@
 
 FuncDefPtr FuncDefNode::clone() const {
     IdPtr cloned_id = getId()->clone();
-    std::vector<IdPtr>* cloned_params = new std::vector<IdPtr>();
+    Vector<IdPtr>* cloned_params = new Vector<IdPtr>();
     for (const auto& param : parameters) {
         cloned_params->push_back(param->clone());
     }

@@ -2,7 +2,7 @@
 
 FuncCallPtr FuncCallNode::clone() const {
     IdPtr cloned_func_id = getFuncId()->clone();
-    std::vector<ExprPtr>* cloned_args = new std::vector<ExprPtr>();
+    Vector<ExprPtr>* cloned_args = new Vector<ExprPtr>();
     for (const auto& arg : arguments) {
         cloned_args->push_back(arg->clone());
     }

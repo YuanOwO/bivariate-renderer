@@ -100,7 +100,7 @@ void* Validator::visit(const FuncDefNode* node) {
         throw SemanticError("Function name '" + func_name + "' is already defined.");
     }
 
-    std::vector<String> param_names;
+    Vector<String> param_names;
     for (const auto& param : node->getParameters()) {
         auto param_name = param->getName();
         if (std::find(param_names.begin(), param_names.end(), param_name) != param_names.end()) {

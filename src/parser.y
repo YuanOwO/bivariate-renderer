@@ -12,7 +12,7 @@ extern int yylex();
 extern int yylineno;
 void yyerror(const char *s);
 
-extern std::vector<ASTPtr> statements;
+extern Vector<ASTPtr> statements;
 extern Environment global_env;
 %}
 
@@ -24,9 +24,9 @@ extern Environment global_env;
     std::string* sval;
     StmtPtr stmt_val;
     ExprPtr expr_val;
-    std::vector<StmtPtr>* stmt_list;
-    std::vector<ExprPtr>* expr_list;
-    std::vector<IdPtr>* id_list;
+    Vector<StmtPtr>* stmt_list;
+    Vector<ExprPtr>* expr_list;
+    Vector<IdPtr>* id_list;
 }
 
 /* 宣告所有在 lexer.l 裡面的 Tokens */
@@ -155,13 +155,13 @@ param_list:
     }
     | T_IDENTIFIER {
         // 處理單個參數
-        $$ = new std::vector<IdPtr>(); // 初始化向量
+        $$ = new Vector<IdPtr>(); // 初始化向量
         $$->push_back(new IdentifierNode(yylineno, *$1)); // 將第一個參數
         delete $1; // 釋放從 lexer 傳來的字串
     }
     | /* empty */ {
         // 處理空參數列表
-        $$ = new std::vector<IdPtr>(); // 初始化為空向量
+        $$ = new Vector<IdPtr>(); // 初始化為空向量
     }
     ;
 
@@ -172,12 +172,12 @@ argument_list:
     }
     | expression {
         // 處理單個參數
-        $$ = new std::vector<ExprPtr>(); // 初始化向量
+        $$ = new Vector<ExprPtr>(); // 初始化向量
         $$->push_back($1);
     }
     | /* empty */ {
         // 處理空參數列表
-        $$ = new std::vector<ExprPtr>(); // 初始化為空向量
+        $$ = new Vector<ExprPtr>(); // 初始化為空向量
     }
     ;
 

@@ -9,10 +9,10 @@ using FuncCallPtr = FuncCallNode*;
 class FuncCallNode : public ExpressionNode {
    private:
     const IdPtr func_id;
-    std::vector<ExprPtr> arguments;
+    Vector<ExprPtr> arguments;
 
    public:
-    FuncCallNode(unsigned int line, IdPtr id, const std::vector<ExprPtr>* args)
+    FuncCallNode(unsigned int line, IdPtr id, const Vector<ExprPtr>* args)
         : ExpressionNode(line), func_id(id) {
         if (args != nullptr) {
             arguments = *args;  // 複製指標 vector
@@ -32,5 +32,5 @@ class FuncCallNode : public ExpressionNode {
 
     const char* getClassName() const override { return "FuncCallNode"; }
     const IdPtr getFuncId() const { return func_id; }
-    const std::vector<ExprPtr>& getArguments() const { return arguments; }
+    const Vector<ExprPtr>& getArguments() const { return arguments; }
 };

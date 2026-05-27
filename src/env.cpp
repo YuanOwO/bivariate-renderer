@@ -10,11 +10,11 @@ void Environment::setVariable(const String name, Value value) {
     values[name] = value;
 }
 
-void Environment::setFunction(const String name, const std::vector<String>& params, ExprPtr body) {
+void Environment::setFunction(const String name, const Vector<String>& params, ExprPtr body) {
     functions[name] = Function(params, body);
 }
 
-void Environment::setBuiltinFunction(const String name, const std::vector<String>& params, BuiltinFunc func) {
+void Environment::setBuiltinFunction(const String name, const Vector<String>& params, BuiltinFunc func) {
     functions[name] = Function(params, func);
 }
 
