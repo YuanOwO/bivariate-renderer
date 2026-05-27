@@ -1,5 +1,4 @@
-#ifndef AST_EXPRESSION_HPP
-#define AST_EXPRESSION_HPP
+#pragma once
 
 #include "basic.hpp"
 
@@ -18,9 +17,7 @@ class ExpressionNode : public ASTNode {
     ExpressionNode(size_t line) : ASTNode(line) {}
 
     virtual const char* getClassName() const override { return "ExpressionNode"; }
-    virtual ExprPtr fold(Environment& env) const = 0;  // 常量折疊
+    virtual ExprPtr fold(Environment& env) const override = 0;  // 常量折疊
 
     bool hasUnknownVariable() const { return has_unknown_variable; }
 };
-
-#endif  // AST_EXPRESSION_HPP

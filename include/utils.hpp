@@ -1,5 +1,4 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
 #include <algorithm>
 
@@ -22,5 +21,3 @@ inline double normalize(T value, T min_value, T max_value) {
 
 RGBColor getRGBGradientJet(double ratio);
 RGBColor getRGBGradientViridis(double ratio);
-
-#endif  // UTILS_HPP

@@ -1,5 +1,4 @@
-#ifndef AST_EXPRESSION_OPERATOR_HPP
-#define AST_EXPRESSION_OPERATOR_HPP
+#pragma once
 
 #include "ast/expression.hpp"
 #include "enums.hpp"
@@ -52,5 +51,3 @@ class BinaryOpNode : public OperatorNode {
     const ExprPtr getLeftOperand() const { return lhs; }
     const ExprPtr getRightOperand() const { return rhs; }
 };
-
-#endif  // AST_EXPRESSION_OPERATOR_HPP

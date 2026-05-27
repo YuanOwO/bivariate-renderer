@@ -1,5 +1,4 @@
-#ifndef AST_STATEMENT_FUNCDEF_HPP
-#define AST_STATEMENT_FUNCDEF_HPP
+#pragma once
 
 #include "ast/statement.hpp"
 
@@ -31,5 +30,3 @@ class FuncDefNode : public DefinitionNode {
     const std::vector<IdPtr>& getParameters() const { return parameters; }
     const ExprPtr getBody() const { return body; }
 };
-
-#endif  // AST_STATEMENT_FUNCDEF_HPP

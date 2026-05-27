@@ -8,7 +8,7 @@
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 6
-#define VERSION_PATCH 1
+#define VERSION_PATCH 2
 
 extern int yyparse();  // Bison 生成的函數
 extern FILE* yyin;     // Flex 使用的檔案指針

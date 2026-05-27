@@ -1,5 +1,4 @@
-#ifndef ENV_HPP
-#define ENV_HPP
+#pragma once
 
 #include <functional>
 #include <initializer_list>
@@ -65,5 +64,3 @@ class Environment {
 };
 
 Environment initGlobalEnvironment();
-
-#endif  // ENV_HPP

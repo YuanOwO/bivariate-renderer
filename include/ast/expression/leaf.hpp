@@ -1,5 +1,4 @@
-#ifndef AST_EXPRESSION_LEAF_HPP
-#define AST_EXPRESSION_LEAF_HPP
+#pragma once
 
 #include "ast/expression.hpp"
 
@@ -49,5 +48,3 @@ class IdentifierNode : public LeafNode {
 
     const String& getName() const { return name; }
 };
-
-#endif  // AST_EXPRESSION_LEAF_HPP

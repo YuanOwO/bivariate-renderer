@@ -1,5 +1,4 @@
-#ifndef ENUMS_HPP
-#define ENUMS_HPP
+#pragma once
 
 enum OPERATOR {
     OP_PLUS,
@@ -17,5 +16,3 @@ enum IMAGE_TYPE {
     IMAGE_JPG,
     IMAGE_UNKNOWN,
 };
-
-#endif  // ENUMS_HPP

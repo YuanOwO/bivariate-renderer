@@ -1,9 +1,4 @@
-#ifndef AST_STATEMENT_HPP
-#define AST_STATEMENT_HPP
-
-#include <memory>
-#include <string>
-#include <vector>
+#pragma once
 
 #include "ast/expression/leaf.hpp"
 #include "basic.hpp"
@@ -18,7 +13,7 @@ class StatementNode : public ASTNode {
     StatementNode(size_t line) : ASTNode(line) {}
 
     virtual const char* getClassName() const override { return "StatementNode"; }
-    virtual StmtPtr fold(Environment& env) const = 0;  // 常量折疊
+    virtual StmtPtr fold(Environment& env) const override = 0;  // 常量折疊
 };
 
 // 變數、函數定義的基底類別
@@ -33,5 +28,3 @@ class DefinitionNode : public StatementNode {
 
     IdPtr getName() const { return name; }
 };
-
-#endif  // AST_STATEMENT_HPP

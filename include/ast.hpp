@@ -1,5 +1,4 @@
-#ifndef AST_HPP
-#define AST_HPP
+#pragma once
 
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"
@@ -10,5 +9,3 @@
 #include "ast/statement/assignment.hpp"
 #include "ast/statement/funcdef.hpp"
 #include "ast/statement/plot.hpp"
-
-#endif  // AST_HPP

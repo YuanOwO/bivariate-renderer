@@ -1,7 +1,4 @@
-#ifndef AST_EXPRESSION_FUNCALL_HPP
-#define AST_EXPRESSION_FUNCALL_HPP
-
-#include <vector>
+#pragma once
 
 #include "ast/expression.hpp"
 #include "ast/expression/leaf.hpp"
@@ -34,5 +31,3 @@ class FuncCallNode : public ExpressionNode {
     const IdPtr getFuncName() const { return func_name; }
     const std::vector<ExprPtr>& getArguments() const { return arguments; }
 };
-
-#endif  // AST_EXPRESSION_FUNCALL_HPP

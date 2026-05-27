@@ -1,5 +1,4 @@
-#ifndef ERRORS_HPP
-#define ERRORS_HPP
+#pragma once
 
 #include <stdexcept>
 
@@ -17,5 +16,3 @@ class RuntimeError : public std::runtime_error {
    public:
     RuntimeError(const std::string& message) : std::runtime_error(message) {}
 };
-
-#endif  // ERRORS_HPP

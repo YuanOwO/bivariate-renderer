@@ -1,5 +1,4 @@
-#ifndef AST_STATEMENT_PLOT_HPP
-#define AST_STATEMENT_PLOT_HPP
+#pragma once
 
 #include "ast/statement.hpp"
 #include "enums.hpp"
@@ -26,5 +25,3 @@ class PlotNode : public StatementNode {
     const String& getFilename() const { return filename; }
     IMAGE_TYPE getImageType() const;
 };
-
-#endif  // AST_STATEMENT_PLOT_HPP

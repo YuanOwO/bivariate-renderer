@@ -1,5 +1,4 @@
-#ifndef AST_STATEMENT_ASSIGNMENT_HPP
-#define AST_STATEMENT_ASSIGNMENT_HPP
+#pragma once
 
 #include "ast/statement.hpp"
 
@@ -21,5 +20,3 @@ class AssignmentNode : public DefinitionNode {
 
     ExprPtr getValue() const { return value; }
 };
-
-#endif  // AST_STATEMENT_ASSIGNMENT_HPP

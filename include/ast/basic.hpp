@@ -1,10 +1,9 @@
+#pragma once
 #define MAGICALLY_STINKY_NUMBER 114514
 
-#ifndef AST_BASIC_HPP
-#  define AST_BASIC_HPP
-
-#  include <ostream>
-#  include <string>
+#include <ostream>
+#include <string>
+#include <vector>
 
 class Environment;        // forward declare
 class ASTNode;            // forward declare
@@ -31,5 +30,3 @@ class ASTNode {
 };
 
 std::ostream& operator<<(std::ostream& os, const ASTPtr& node);
-
-#endif  // AST_BASIC_HPP
