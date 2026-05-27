@@ -3,7 +3,6 @@
 #include "ast/ast.hpp"
 #include "ast/expression/leaf.hpp"
 
-class Environment;
 class StatementNode;
 using StmtPtr = StatementNode*;
 
@@ -12,19 +11,20 @@ class StatementNode : public ASTNode {
    public:
     StatementNode(size_t line) : ASTNode(line) {}
 
+    virtual StmtPtr clone() const override = 0;
+
     virtual const char* getClassName() const override { return "StatementNode"; }
-    virtual StmtPtr fold(Environment& env) const override = 0;  // 常量折疊
 };
 
 // 變數、函數定義的基底類別
 class DefinitionNode : public StatementNode {
    private:
-    IdPtr name;
+    IdPtr id;
 
    public:
-    DefinitionNode(size_t line, IdPtr var_name) : StatementNode(line), name(var_name) {}
+    DefinitionNode(size_t line, IdPtr var_id) : StatementNode(line), id(var_id) {}
+    virtual ~DefinitionNode() { delete id; }
 
     virtual const char* getClassName() const override { return "DefinitionNode"; }
-
-    IdPtr getName() const { return name; }
+    const IdPtr getId() const { return id; }
 };

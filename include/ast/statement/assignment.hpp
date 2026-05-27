@@ -7,16 +7,15 @@ using AssignPtr = AssignmentNode*;
 
 class AssignmentNode : public DefinitionNode {
    private:
-    ExprPtr value;
+    const ExprPtr value;
 
    public:
-    AssignmentNode(size_t line, IdPtr var_name, ExprPtr val) : DefinitionNode(line, var_name), value(val) {}
+    AssignmentNode(size_t line, IdPtr var_id, ExprPtr val) : DefinitionNode(line, var_id), value(val) {}
+    ~AssignmentNode() { delete value; }
+
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    AssignPtr clone() const override;
 
     const char* getClassName() const override { return "AssignmentNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    AssignPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
-
-    ExprPtr getValue() const { return value; }
+    const ExprPtr getValue() const { return value; }
 };

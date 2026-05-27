@@ -23,13 +23,12 @@ class UnaryOpNode : public OperatorNode {
    public:
     UnaryOpNode(size_t line, OPERATOR operator_id, ExprPtr operand_node)
         : OperatorNode(line, operator_id), operand(operand_node) {}
+    ~UnaryOpNode() { delete operand; }
+
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    UnaryOpNode* clone() const override;
 
     const char* getClassName() const override { return "UnaryOpNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    ExprPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
-
     const ExprPtr getOperand() const { return operand; }
 };
 
@@ -41,13 +40,15 @@ class BinaryOpNode : public OperatorNode {
    public:
     BinaryOpNode(size_t line, OPERATOR operator_id, ExprPtr left_node, ExprPtr right_node)
         : OperatorNode(line, operator_id), lhs(left_node), rhs(right_node) {}
+    ~BinaryOpNode() {
+        delete lhs;
+        delete rhs;
+    }
+
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    BinaryOpNode* clone() const override;
 
     const char* getClassName() const override { return "BinaryOpNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    ExprPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
-
     const ExprPtr getLeftOperand() const { return lhs; }
     const ExprPtr getRightOperand() const { return rhs; }
 };

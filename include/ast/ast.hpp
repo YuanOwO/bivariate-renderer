@@ -1,11 +1,11 @@
 #pragma once
-#define MAGICALLY_STINKY_NUMBER 114514
 
 #include <ostream>
 #include <string>
 #include <vector>
 
-class Environment;        // forward declare
+#include "visitor/visitor.hpp"
+
 class ASTNode;            // forward declare
 using ASTPtr = ASTNode*;  // 使用傳統指標，因為 Bison 的 %union 不支援智能指標
 
@@ -20,12 +20,11 @@ class ASTNode {
    public:
     ASTNode(size_t line) : lineno(line) {}
     virtual ~ASTNode() = default;
-    virtual const char* getClassName() const { return "ASTNode"; }
-    virtual bool validate(Environment& env) = 0;         // 驗證語義
-    virtual void serialize(std::ostream& os) const = 0;  // 序列化為可讀格式
-    virtual ASTPtr fold(Environment& env) const = 0;     // 常量折疊
-    virtual Value evaluate(Environment& env) const = 0;  // 評估表達式的值
 
+    virtual void* accept(Visitor& visitor) const = 0;  // 接受訪問者模式
+    virtual ASTPtr clone() const = 0;                  // 用於深複製 AST 節點
+
+    virtual const char* getClassName() const { return "ASTNode"; }
     size_t getLineno() const { return lineno; }
 };
 

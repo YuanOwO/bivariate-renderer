@@ -1,8 +1,11 @@
 #include "ast/ast.hpp"
 
+#include "visitor/serializer.hpp"
+
 std::ostream& operator<<(std::ostream& os, const ASTPtr& node) {
     if (node) {
-        node->serialize(os);
+        Serializer serializer(os);
+        node->accept(serializer);
     } else {
         os << "null";
     }

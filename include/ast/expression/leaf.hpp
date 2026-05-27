@@ -23,12 +23,10 @@ class NumberNode : public LeafNode {
    public:
     NumberNode(size_t line, double val) : LeafNode(line), value(val) {}
 
-    const char* getClassName() const override { return "NumberNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    LeafPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    NumPtr clone() const override;
 
+    const char* getClassName() const override { return "NumberNode"; }
     Value getValue() const { return value; }
 };
 
@@ -40,11 +38,9 @@ class IdentifierNode : public LeafNode {
     IdentifierNode(size_t line, const String& n) : LeafNode(line), name(n) {}
     IdentifierNode(size_t line, const char* n) : LeafNode(line), name(n) {}
 
-    const char* getClassName() const override { return "IdentifierNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    LeafPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    IdPtr clone() const override;
 
+    const char* getClassName() const override { return "IdentifierNode"; }
     const String& getName() const { return name; }
 };

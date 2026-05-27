@@ -18,14 +18,17 @@ class FuncDefNode : public DefinitionNode {
             delete params;         // 釋放參數列表的記憶體
         }
     }
-    FuncDefNode(size_t line, IdPtr func_name, const std::vector<IdPtr>& params, ExprPtr func_body)
-        : DefinitionNode(line, func_name), parameters(params), body(func_body) {}
+    ~FuncDefNode() {
+        for (auto param : parameters) {
+            delete param;  // 釋放參數的記憶體
+        }
+        delete body;  // 釋放函數體的記憶體
+    }
+
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    FuncDefPtr clone() const override;
 
     const char* getClassName() const override { return "FuncDefNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    FuncDefPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
 
     const std::vector<IdPtr>& getParameters() const { return parameters; }
     const ExprPtr getBody() const { return body; }

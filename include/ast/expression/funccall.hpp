@@ -8,26 +8,29 @@ using FuncCallPtr = FuncCallNode*;
 
 class FuncCallNode : public ExpressionNode {
    private:
-    const IdPtr func_name;
+    const IdPtr func_id;
     std::vector<ExprPtr> arguments;
 
    public:
-    FuncCallNode(unsigned int line, IdPtr func_name, const std::vector<ExprPtr>* args)
-        : ExpressionNode(line), func_name(func_name) {
+    FuncCallNode(unsigned int line, IdPtr id, const std::vector<ExprPtr>* args)
+        : ExpressionNode(line), func_id(id) {
         if (args != nullptr) {
-            arguments = *args;  // 從指標解引用獲取參數列表
-            delete args;        // 釋放參數列表的記憶體
+            arguments = *args;  // 複製指標 vector
+            delete args;        // 安全釋放 Bison 產生的暫時 vector 容器
         }
     }
-    FuncCallNode(unsigned int line, IdPtr func_name, const std::vector<ExprPtr>& args)
-        : ExpressionNode(line), func_name(func_name), arguments(args) {}
+
+    ~FuncCallNode() {
+        delete func_id;
+        for (ExprPtr arg : arguments) {
+            delete arg;
+        }
+    }
+
+    void* accept(Visitor& visitor) const override { return visitor.visit(this); }
+    FuncCallPtr clone() const override;
 
     const char* getClassName() const override { return "FuncCallNode"; }
-    void serialize(std::ostream& os) const override;
-    bool validate(Environment& env) override;
-    ExprPtr fold(Environment& env) const override;
-    Value evaluate(Environment& env) const override;
-
-    const IdPtr getFuncName() const { return func_name; }
+    const IdPtr getFuncId() const { return func_id; }
     const std::vector<ExprPtr>& getArguments() const { return arguments; }
 };
