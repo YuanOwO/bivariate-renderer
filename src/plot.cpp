@@ -6,12 +6,7 @@
 #include "stb/stb_image_write.h"
 #include "utils.hpp"
 
-void renderPlot(const String& filename, const std::vector<Value>& data, int resolution) {
-    // 目前暫不實現具體的繪圖功能
-    // 這裡可以添加對繪圖庫的調用，將計算結果渲染成圖片
-
-    std::cout << "Plotting expression to file: " << filename << std::endl;
-
+bool renderPlot(const String& filename, const std::vector<Value>& data, int resolution) {
     std::vector<Uint8> imageData(resolution * resolution * 3);  // 預設為白色背景
 
     for (size_t i = 0; i < data.size(); ++i) {
@@ -48,12 +43,6 @@ void renderPlot(const String& filename, const std::vector<Value>& data, int reso
         break;
     default:
         std::cerr << "Unexpected error in determining image type for file: " << filename << std::endl;
-        return;
     }
-
-    if (!success) {
-        std::cerr << "Failed to write image to file: " << filename << std::endl;
-    } else {
-        std::cout << "Successfully wrote image to file: " << filename << std::endl;
-    }
+    return success;
 }

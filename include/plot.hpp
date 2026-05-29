@@ -5,4 +5,4 @@
 
 #include "types.hpp"
 
-void renderPlot(const String& filename, const std::vector<Value>& data, int resolution = 800);
+bool renderPlot(const String& filename, const std::vector<Value>& data, int resolution = 800);

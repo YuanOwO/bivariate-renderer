@@ -1,6 +1,7 @@
 #include "visitor/evaluator.hpp"
 
 #include <cmath>
+#include <iostream>
 #include <limits>
 
 #include "ast.hpp"
@@ -121,8 +122,8 @@ void* Evaluator::visit(const FuncDefNode* node) {
 }
 
 void* Evaluator::visit(const PlotNode* node) {
-    // 目前暫不實現具體的繪圖功能
-    // 這裡可以添加對繪圖庫的調用，將計算結果渲染成圖片
+    String filename = node->getFilename();
+    std::cout << "Plotting expression to file: " << filename << std::endl;
 
     int resolution = 800;
     Value min_x = -10, max_x = 10;
@@ -165,7 +166,13 @@ void* Evaluator::visit(const PlotNode* node) {
         }
     }
 
-    renderPlot(node->getFilename(), data, resolution);
+    bool success = renderPlot(node->getFilename(), data, resolution);
+
+    if (!success) {
+        std::cerr << "Failed to write image to file: " << filename << std::endl;
+    } else {
+        std::cout << "Successfully wrote image to file: " << filename << std::endl;
+    }
 
     return nullptr;
 }
