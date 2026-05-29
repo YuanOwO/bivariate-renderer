@@ -1,4 +1,4 @@
-#include "visitor/constantFolder.hpp"
+#include "visitor/folder.hpp"
 
 #include <cmath>
 
