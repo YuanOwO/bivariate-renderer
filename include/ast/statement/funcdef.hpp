@@ -2,9 +2,6 @@
 
 #include "ast/statement.hpp"
 
-class FuncDefNode;  // forward declare
-using FuncDefPtr = FuncDefNode*;
-
 class FuncDefNode : public DefinitionNode {
    private:
     Vector<IdPtr> parameters;

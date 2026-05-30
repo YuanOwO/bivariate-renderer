@@ -3,9 +3,6 @@
 #include "ast/ast.hpp"
 #include "ast/expression/leaf.hpp"
 
-class StatementNode;
-using StmtPtr = StatementNode*;
-
 // 所有語句節點的基底類別
 class StatementNode : public ASTNode {
    public:

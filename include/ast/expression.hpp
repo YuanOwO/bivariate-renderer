@@ -2,9 +2,6 @@
 
 #include "ast/ast.hpp"
 
-class ExpressionNode;  // forward declare
-using ExprPtr = ExpressionNode*;
-
 // 所有表達式節點的基底類別
 class ExpressionNode : public ASTNode {
    public:

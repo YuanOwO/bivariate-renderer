@@ -2,13 +2,6 @@
 
 #include "ast/expression.hpp"
 
-class LeafNode;
-class NumberNode;
-class IdentifierNode;
-using LeafPtr = LeafNode*;
-using NumPtr = NumberNode*;
-using IdPtr = IdentifierNode*;
-
 class LeafNode : public ExpressionNode {
    public:
     LeafNode(size_t line) : ExpressionNode(line) {}

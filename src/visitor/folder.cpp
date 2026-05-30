@@ -5,17 +5,17 @@
 #include "ast.hpp"
 #include "errors.hpp"
 
-void* ConstantFolder::visit(const NumberNode* node) {
+void* Folder::visit(const NumberNode* node) {
     // 數字節點不需要折疊，直接返回自身
     return node->clone();
 }
 
-void* ConstantFolder::visit(const IdentifierNode* node) {
+void* Folder::visit(const IdentifierNode* node) {
     // 變數節點無法折疊，直接返回自身
     return node->clone();
 }
 
-void* ConstantFolder::visit(const UnaryOpNode* node) {
+void* Folder::visit(const UnaryOpNode* node) {
     // 先折疊子節點
     ExprPtr operand = static_cast<ExprPtr>(fold(node->getOperand()));
     auto op = node->getOperatorId();
@@ -42,14 +42,14 @@ void* ConstantFolder::visit(const UnaryOpNode* node) {
     return new UnaryOpNode(node->getLineno(), op, operand);
 }
 
-void* ConstantFolder::visit(const BinaryOpNode* node) {
+void* Folder::visit(const BinaryOpNode* node) {
     // 先折疊左右子節點
     ExprPtr left = static_cast<ExprPtr>(fold(node->getLeftOperand()));
     ExprPtr right = static_cast<ExprPtr>(fold(node->getRightOperand()));
     auto op = node->getOperatorId();
 
-    auto left_num = dynamic_cast<NumberNode*>(left);
-    auto right_num = dynamic_cast<NumberNode*>(right);
+    auto left_num = dynamic_cast<NumPtr>(left);
+    auto right_num = dynamic_cast<NumPtr>(right);
 
     // 如果左右子節點都是數字，直接計算結果
     if (left_num && right_num) {
@@ -81,7 +81,7 @@ void* ConstantFolder::visit(const BinaryOpNode* node) {
     return new BinaryOpNode(node->getLineno(), op, left, right);
 }
 
-void* ConstantFolder::visit(const FuncCallNode* node) {
+void* Folder::visit(const FuncCallNode* node) {
     // 先折疊函數名稱和參數
     IdPtr func_id = node->getFuncId()->clone();
     Vector<ExprPtr>* args = new Vector<ExprPtr>();
@@ -91,12 +91,12 @@ void* ConstantFolder::visit(const FuncCallNode* node) {
     return new FuncCallNode(node->getLineno(), func_id, args);
 }
 
-void* ConstantFolder::visit(const AssignmentNode* node) {
+void* Folder::visit(const AssignmentNode* node) {
     ExprPtr value = static_cast<ExprPtr>(fold(node->getValue()));
     return new AssignmentNode(node->getLineno(), node->getId()->clone(), value);
 }
 
-void* ConstantFolder::visit(const FuncDefNode* node) {
+void* Folder::visit(const FuncDefNode* node) {
     ExprPtr body = static_cast<ExprPtr>(fold(node->getBody()));
     Vector<IdPtr>* params = new Vector<IdPtr>();
     for (const auto& param : node->getParameters()) {
@@ -105,7 +105,7 @@ void* ConstantFolder::visit(const FuncDefNode* node) {
     return new FuncDefNode(node->getLineno(), node->getId()->clone(), params, body);
 }
 
-void* ConstantFolder::visit(const PlotNode* node) {
+void* Folder::visit(const PlotNode* node) {
     ExprPtr expr = static_cast<ExprPtr>(fold(node->getExpression()));
     return new PlotNode(node->getLineno(), expr, node->getFilename());
 }

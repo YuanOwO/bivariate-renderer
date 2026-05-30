@@ -3,10 +3,10 @@
 #include "env.hpp"
 #include "visitor/visitor.hpp"
 
-class ConstantFolder : public Visitor {
+class Folder : public Visitor {
    private:
    public:
-    ConstantFolder(Environment* environment) {}
+    Folder(Environment* environment) {}
 
     // 外部 Driver 呼叫的入口：傳入舊樹根，回傳優化後的新樹根
     ASTPtr fold(ASTPtr node) {

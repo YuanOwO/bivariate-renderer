@@ -2,9 +2,6 @@
 
 #include "ast/statement.hpp"
 
-class AssignmentNode;
-using AssignPtr = AssignmentNode*;
-
 class AssignmentNode : public DefinitionNode {
    private:
     const ExprPtr value;

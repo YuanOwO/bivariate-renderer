@@ -3,9 +3,6 @@
 #include "ast/expression.hpp"
 #include "ast/expression/leaf.hpp"
 
-class FuncCallNode;  // forward declare
-using FuncCallPtr = FuncCallNode*;
-
 class FuncCallNode : public ExpressionNode {
    private:
     const IdPtr func_id;

@@ -7,9 +7,6 @@
 #include "types.hpp"
 #include "visitor/visitor.hpp"
 
-class ASTNode;            // forward declare
-using ASTPtr = ASTNode*;  // 使用傳統指標，因為 Bison 的 %union 不支援智能指標
-
 // 所有 AST 節點的基底類別
 class ASTNode {
    private:

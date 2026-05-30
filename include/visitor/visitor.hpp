@@ -1,13 +1,6 @@
 #pragma once
 
-class NumberNode;
-class IdentifierNode;
-class UnaryOpNode;
-class BinaryOpNode;
-class FuncCallNode;
-class AssignmentNode;
-class FuncDefNode;
-class PlotNode;
+#include "types.hpp"
 
 class Visitor {
    public:

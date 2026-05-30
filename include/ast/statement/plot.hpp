@@ -3,9 +3,6 @@
 #include "ast/statement.hpp"
 #include "enums.hpp"
 
-class PlotNode;  // forward declare
-using PlotPtr = PlotNode*;
-
 class PlotNode : public StatementNode {
    private:
     const ExprPtr expression;
